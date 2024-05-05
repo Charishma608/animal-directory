@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Animal Directory</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 20px;
+      background-color: #e7bef7;
+    }
+    h1 {
+      color: #333;
+      text-align: center;
+    }
+    form {
+      margin-bottom: 20px;
+    }
+    label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: bold;
+    }
+    input[type="text"] {
+      width: 100%;
+      padding: 8px;
+      margin-bottom: 10px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      box-sizing: border-box;
+    }
+    button {
+      background-color: #4c87af;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #6f97b1;
+    }
+    #animalList {
+      background-color: #fff;
+      padding: 20px;
+      border-radius: 4px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    .animalItem {
+      margin-bottom: 10px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Animals & Species</h1>
+
+  <!-- Form for adding a new animal -->
+  <form id="addAnimalForm">
+    <label for="name">Name:</label>
+    <input type="text" id="name" name="name" required>
+    <label for="species">Species:</label>
+    <input type="text" id="species" name="species" required>
+    <button type="submit">Add Animal</button>
+  </form>
+
+  <!-- Form for updating an existing animal -->
+  <form id="updateAnimalForm">
+    <label for="animalId">Animal ID:</label>
+    <input type="text" id="animalId" name="animalId" required>
+    <label for="updatedName">Updated Name:</label>
+    <input type="text" id="updatedName" name="updatedName" required>
+    <label for="updatedSpecies">Updated Species:</label>
+    <input type="text" id="updatedSpecies" name="updatedSpecies" required>
+    <button type="submit">Update Animal</button>
+  </form>
+
+  <!-- Form for deleting an animal -->
+  <form id="deleteAnimalForm">
+    <label for="deleteId">Animal ID to Delete:</label>
+    <input type="text" id="deleteId" name="deleteId" required>
+    <button type="submit">Delete Animal</button>
+  </form>
+
+ 
+  <script>
+
+
+
+    // Function to fetch and display all animals
+async function fetchAnimals() {
+  try {
+    const response = await fetch('/animals');
+    const animals = await response.json();
+    const animalList = document.getElementById('animalList');
+    animalList.innerHTML = ''; 
+    animals.forEach(animal => {
+      const animalItem = document.createElement('div');
+      animalItem.textContent = `Name: ${animal.name}, Species: ${animal.species}`;
+      animalList.appendChild(animalItem);
+    });
+  } catch (err) {
+    console.error('Error fetching animals:', err);
+  }
+}
+document.addEventListener('DOMContentLoaded', () => {
+  fetchAnimals();
+});
+
+    // Function to fetch and display all animals
+    async function fetchAnimals() {
+      const response = await fetch('/animals');
+      const animals = await response.json();
+      const animalList = document.getElementById('animalList');
+      animalList.innerHTML = '';
+      animals.forEach(animal => {
+        const animalItem = document.createElement('div');
+        animalItem.classList.add('animalItem');
+        animalItem.textContent = `Name: ${animal.name}, Species: ${animal.species}`;
+        animalList.appendChild(animalItem);
+      });
+    }
+
+    // Function to add a new animal
+    async function addAnimal(event) {
+      event.preventDefault();
+      const formData = new FormData(event.target);
+      const animal = {
+        name: formData.get('name'),
+        species: formData.get('species')
+      };
+      await fetch('/animals', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(animal)
+      });
+      fetchAnimals();
+    }
+
+    // Function to update an existing animal
+    async function updateAnimal(event) {
+      event.preventDefault();
+      const formData = new FormData(event.target);
+      const animalId = formData.get('animalId');
+      const updatedAnimal = {
+        name: formData.get('updatedName'),
+        species: formData.get('updatedSpecies')
+      };
+      await fetch(`/animals/${animalId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(updatedAnimal)
+      });
+      fetchAnimals();
+    }
+
+    // Function to delete an animal
+    async function deleteAnimal(event) {
+      event.preventDefault();
+      const formData = new FormData(event.target);
+      const animalId = formData.get('deleteId');
+      await fetch(`/animals/${animalId}`, {
+        method: 'DELETE'
+      });
+      fetchAnimals();
+    }
+
+    document.getElementById('addAnimalForm').addEventListener('submit', addAnimal);
+    document.getElementById('updateAnimalForm').addEventListener('submit', updateAnimal);
+    document.getElementById('deleteAnimalForm').addEventListener('submit', deleteAnimal);
+
+    
+    fetchAnimals();
+  </script>
+</body>
+</html>
